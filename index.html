@@ -121,16 +121,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>💰 USDC Rank Calculator</h1>
+        <h1>💰 Weekly Rank to $USDC </h1>
         
         <div class="input-group">
             <label for="rank">Your Rank:</label>
-            <input type="number" id="rank" placeholder="Enter your rank (1-1000)" min="1" max="1000">
-        </div>
-        
-        <div class="input-group">
-            <label for="totalPool">Total USDC Pool:</label>
-            <input type="number" id="totalPool" placeholder="Enter total USDC pool" min="0" step="0.01">
+            <input type="number" id="rank" placeholder="Enter your rank (1-3000)" min="1" max="3000">
         </div>
         
         <button onclick="calculateReward()">Calculate My Reward</button>
@@ -144,48 +139,68 @@
     <script>
         function calculateReward() {
             const rank = parseInt(document.getElementById('rank').value);
-            const totalPool = parseFloat(document.getElementById('totalPool').value);
             
-            if (!rank || !totalPool || rank < 1 || rank > 1000) {
-                alert('Please enter valid rank (1-1000) and total pool amount');
+            if (!rank || rank < 1) {
+                alert('Please enter a valid rank (1 or higher)');
                 return;
             }
             
-            // Example reward calculation - adjust this logic based on your needs
-            let rewardMultiplier;
-            if (rank <= 10) {
-                rewardMultiplier = 0.1; // Top 10 get 10% share
-            } else if (rank <= 50) {
-                rewardMultiplier = 0.05; // Next 40 get 5% share
-            } else if (rank <= 100) {
-                rewardMultiplier = 0.02; // Next 50 get 2% share
-            } else if (rank <= 500) {
-                rewardMultiplier = 0.01; // Next 400 get 1% share
-            } else {
-                rewardMultiplier = 0.005; // Rest get 0.5% share
+            // Get reward based on exact tier system
+            const tierInfo = getTierInfo(rank);
+            
+            if (!tierInfo) {
+                document.getElementById('rewardAmount').textContent = `$0.00 USDC`;
+                document.getElementById('rankInfo').textContent = `Rank #${rank} - No reward for this rank`;
+                document.getElementById('result').classList.add('show');
+                return;
             }
             
-            const reward = (totalPool * rewardMultiplier) / getRankBracketSize(rank);
-            
-            document.getElementById('rewardAmount').textContent = `$${reward.toFixed(2)} USDC`;
-            document.getElementById('rankInfo').textContent = `Rank #${rank} - ${getRankBracketName(rank)}`;
+            document.getElementById('rewardAmount').textContent = `${tierInfo.prize.toFixed(2)} USDC`;
+            document.getElementById('rankInfo').textContent = `Rank #${rank} - ${tierInfo.name}`;
             document.getElementById('result').classList.add('show');
         }
         
-        function getRankBracketSize(rank) {
-            if (rank <= 10) return 10;
-            if (rank <= 50) return 40;
-            if (rank <= 100) return 50;
-            if (rank <= 500) return 400;
-            return 500;
-        }
-        
-        function getRankBracketName(rank) {
-            if (rank <= 10) return 'Elite Tier';
-            if (rank <= 50) return 'Gold Tier';
-            if (rank <= 100) return 'Silver Tier';
-            if (rank <= 500) return 'Bronze Tier';
-            return 'Participant Tier';
+        function getTierInfo(rank) {
+            // Tier 1: Top 3 winners - $600 each
+            if (rank <= 3) {
+                return { name: 'Tier 1', prize: 600 };
+            }
+            // Tier 2: Next 7 winners (ranks 4-10) - $350 each
+            else if (rank <= 10) {
+                return { name: 'Tier 2', prize: 350 };
+            }
+            // Tier 3: Next 20 winners (ranks 11-30) - $125 each
+            else if (rank <= 30) {
+                return { name: 'Tier 3', prize: 125 };
+            }
+            // Tier 4: Next 50 winners (ranks 31-80) - $60 each
+            else if (rank <= 80) {
+                return { name: 'Tier 4', prize: 60 };
+            }
+            // Tier 5: Next 100 winners (ranks 81-180) - $30 each
+            else if (rank <= 180) {
+                return { name: 'Tier 5', prize: 30 };
+            }
+            // Tier 6: Next 200 winners (ranks 181-380) - $20 each
+            else if (rank <= 380) {
+                return { name: 'Tier 6', prize: 20 };
+            }
+            // Tier 7: Next 400 winners (ranks 381-780) - $10 each
+            else if (rank <= 780) {
+                return { name: 'Tier 7', prize: 10 };
+            }
+            // Tier 8: Next 800 winners (ranks 781-1580) - $5 each
+            else if (rank <= 1580) {
+                return { name: 'Tier 8', prize: 5 };
+            }
+            // Tier 9: Next 1420 winners (ranks 1581-3000) - $3 each
+            else if (rank <= 3000) {
+                return { name: 'Tier 9', prize: 3 };
+            }
+            // No reward for ranks beyond 3000
+            else {
+                return null;
+            }
         }
     </script>
 </body>
