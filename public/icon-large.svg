@@ -1,0 +1,56 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="128" cy="128" r="128" fill="url(#gradient)"/>
+  
+  <!-- Subtle outer ring -->
+  <circle cx="128" cy="128" r="115" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  
+  <!-- Inner circle for dollar sign -->
+  <circle cx="128" cy="128" r="50" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Money/Dollar icon -->
+  <g transform="translate(128, 128)">
+    <!-- Vertical lines of dollar sign -->
+    <line x1="0" y1="-35" x2="0" y2="-25" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    <line x1="0" y1="25" x2="0" y2="35" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    
+    <!-- S shape -->
+    <path d="M-18 -15 Q-25 -22 -18 -22 L12 -22 Q25 -22 25 -8 Q25 3 12 3 L-12 3 Q-25 3 -25 17 Q-25 30 -12 30 L18 30 Q25 25 18 25" 
+          fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  
+  <!-- USDC text below -->
+  <text x="128" y="200" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700">USDC</text>
+  
+  <!-- Small decorative sparkles -->
+  <g opacity="0.7">
+    <!-- Top left -->
+    <g transform="translate(60, 60)">
+      <path d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1 Z" fill="white"/>
+    </g>
+    
+    <!-- Top right -->
+    <g transform="translate(196, 70)">
+      <path d="M0 -3 L0.8 -0.8 L3 0 L0.8 0.8 L0 3 L-0.8 0.8 L-3 0 L-0.8 -0.8 Z" fill="white"/>
+    </g>
+    
+    <!-- Bottom left -->
+    <g transform="translate(50, 186)">
+      <path d="M0 -2 L0.5 -0.5 L2 0 L0.5 0.5 L0 2 L-0.5 0.5 L-2 0 L-0.5 -0.5 Z" fill="white"/>
+    </g>
+    
+    <!-- Bottom right -->
+    <g transform="translate(206, 196)">
+      <path d="M0 -3 L0.8 -0.8 L3 0 L0.8 0.8 L0 3 L-0.8 0.8 L-3 0 L-0.8 -0.8 Z" fill="white"/>
+    </g>
+  </g>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

@@ -125,7 +125,7 @@ export default function Home() {
 
 Calculate your rewards too! 👇`;
 
-    const shareUrl = 'https://reward-calc-kqvp.vercel.app';
+    const shareUrl = 'https://farcaster.xyz/miniapps/U-U53B-zNNUb/weekly-rank-usdc-calculator';
 
     // Try Farcaster sharing first if available
     if (isInFarcasterFrame && farcasterContext) {
