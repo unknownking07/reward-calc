@@ -4,6 +4,7 @@
     { "src": "api/frame.js", "use": "@vercel/node" }
   ],
   "rewrites": [
+    { "source": "/farcaster.json", "destination": "/farcaster.json" },  // ✅ allow direct access
     { "source": "/api/(.*)", "destination": "/api/$1.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
