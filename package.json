@@ -2,12 +2,12 @@
   "name": "weekly-rank-usdc-calculator",
   "version": "1.0.0",
   "description": "Calculate your weekly USDC rewards based on your rank - A Farcaster Frame compatible application",
-  "main": "index.html",
+  "main": "index.js",
   "scripts": {
-    "dev": "npx serve .",
-    "build": "echo 'Static site - no build needed'",
-    "start": "npx serve .",
-    "preview": "npx serve .",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
     "deploy": "vercel --prod"
   },
   "keywords": [
@@ -17,12 +17,19 @@
     "rewards",
     "calculator",
     "crypto",
-    "web3"
+    "web3",
+    "nextjs"
   ],
   "author": "unknownking07",
   "license": "MIT",
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
   "devDependencies": {
-    "serve": "^14.2.1"
+    "eslint": "^8.45.0",
+    "eslint-config-next": "^14.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
