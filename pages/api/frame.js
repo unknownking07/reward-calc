@@ -26,6 +26,7 @@ export default async function handler(req, res) {
           <meta property="fc:frame:button:1" content="Calculate Reward">
           <meta property="fc:frame:button:1:action" content="post">
           <meta property="fc:frame:button:1:target" content="https://reward-calc-kqvp.vercel.app/api/frame">
+          <meta property="fc:frame:input:text" content="Enter your rank (1-3000)">
           
           <!-- Open Graph Meta Tags -->
           <meta property="og:title" content="Weekly Rank to $USDC">
@@ -70,36 +71,44 @@ export default async function handler(req, res) {
         ? `Rank #${rank} - ${tierInfo.name}: $${tierInfo.prize.toFixed(2)} USDC`
         : `Rank #${rank} - No reward available`;
 
-      // Return proper frame response
-      const frameResponse = {
-        type: 'frame',
-        version: 'vNext',
-        image: `https://reward-calc-kqvp.vercel.app/frame-image.png`,
-        buttons: [
-          {
-            label: 'Try Again',
-            action: 'post',
-            target: 'https://reward-calc-kqvp.vercel.app/api/frame'
-          },
-          {
-            label: 'Visit App',
-            action: 'link',
-            target: 'https://reward-calc-kqvp.vercel.app'
-          }
-        ],
-        input: {
-          text: 'Enter your rank (1-3000)'
-        },
-        post_url: 'https://reward-calc-kqvp.vercel.app/api/frame',
-        og: {
-          title: 'Your USDC Reward Result',
-          description: rewardText,
-          image: 'https://reward-calc-kqvp.vercel.app/frame-image.png'
-        }
-      };
+      // Create a result image URL (you would typically generate this dynamically)
+      const resultImageUrl = `https://reward-calc-kqvp.vercel.app/frame-image.png`;
 
-      res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(frameResponse);
+      // Return proper frame response with updated meta tags
+      const responseHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Your USDC Reward Result</title>
+            
+            <!-- Farcaster Frame Meta Tags -->
+            <meta property="fc:frame" content="vNext">
+            <meta property="fc:frame:image" content="${resultImageUrl}">
+            <meta property="fc:frame:button:1" content="Try Again">
+            <meta property="fc:frame:button:1:action" content="post">
+            <meta property="fc:frame:button:1:target" content="https://reward-calc-kqvp.vercel.app/api/frame">
+            <meta property="fc:frame:button:2" content="Visit App">
+            <meta property="fc:frame:button:2:action" content="link">
+            <meta property="fc:frame:button:2:target" content="https://reward-calc-kqvp.vercel.app">
+            <meta property="fc:frame:input:text" content="Enter your rank (1-3000)">
+            
+            <!-- Open Graph Meta Tags -->
+            <meta property="og:title" content="Your USDC Reward Result">
+            <meta property="og:description" content="${rewardText}">
+            <meta property="og:image" content="${resultImageUrl}">
+            <meta property="og:url" content="https://reward-calc-kqvp.vercel.app">
+          </head>
+          <body>
+            <h1>Your USDC Reward Result</h1>
+            <p>${rewardText}</p>
+          </body>
+        </html>
+      `;
+
+      res.setHeader('Content-Type', 'text/html');
+      res.status(200).send(responseHtml);
       
     } catch (error) {
       console.error('Error processing frame request:', error);

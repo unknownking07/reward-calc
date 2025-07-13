@@ -1,6 +1,83 @@
 import Head from 'next/head';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [farcasterContext, setFarcasterContext] = useState(null);
+
+  useEffect(() => {
+    // Initialize Farcaster SDK when component mounts
+    const initializeFarcaster = async () => {
+      try {
+        // Check if we're in a Farcaster context
+        if (typeof window !== 'undefined' && window.parent !== window) {
+          // We're likely in a Farcaster frame
+          
+          // Import Farcaster SDK dynamically to avoid SSR issues
+          const { sdk } = await import('@farcaster/frame-sdk');
+          
+          // Initialize the SDK
+          const context = await sdk.context;
+          setFarcasterContext(context);
+          
+          // Signal that the frame is ready
+          sdk.actions.ready();
+          console.log('Farcaster SDK initialized and ready() called');
+        }
+      } catch (error) {
+        console.log('Not in Farcaster context or SDK unavailable:', error);
+        // This is normal when running outside of Farcaster
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeFarcaster();
+  }, []);
+
+  const calculateReward = () => {
+    const rankInput = document.getElementById('rank');
+    const resultDiv = document.getElementById('result');
+    const rank = parseInt(rankInput.value);
+    
+    if (!rank || rank < 1 || rank > 3000) {
+      resultDiv.innerHTML = '<div style="color: red;">Please enter a valid rank between 1 and 3000</div>';
+      resultDiv.classList.add('show');
+      return;
+    }
+    
+    const tierInfo = getTierInfo(rank);
+    
+    if (tierInfo) {
+      resultDiv.innerHTML = `
+        <div style="color: #333;">
+          <h3>Your Reward</h3>
+          <p><strong>Rank #${rank}</strong></p>
+          <p><strong>${tierInfo.name}</strong></p>
+          <p style="color: #667eea; font-size: 24px; font-weight: bold;">$${tierInfo.prize.toFixed(2)} USDC</p>
+          ${farcasterContext ? `<p style="color: #666; font-size: 12px;">Farcaster User: ${farcasterContext.user?.displayName || 'Anonymous'}</p>` : ''}
+        </div>
+      `;
+    } else {
+      resultDiv.innerHTML = '<div style="color: #999;">Rank #' + rank + ' - No reward available</div>';
+    }
+    
+    resultDiv.classList.add('show');
+  };
+
+  const getTierInfo = (rank) => {
+    if (rank <= 3) return { name: 'Tier 1', prize: 600 };
+    if (rank <= 10) return { name: 'Tier 2', prize: 350 };
+    if (rank <= 30) return { name: 'Tier 3', prize: 125 };
+    if (rank <= 80) return { name: 'Tier 4', prize: 60 };
+    if (rank <= 180) return { name: 'Tier 5', prize: 30 };
+    if (rank <= 380) return { name: 'Tier 6', prize: 20 };
+    if (rank <= 780) return { name: 'Tier 7', prize: 10 };
+    if (rank <= 1580) return { name: 'Tier 8', prize: 5 };
+    if (rank <= 3000) return { name: 'Tier 9', prize: 3 };
+    return null;
+  };
+
   return (
     <>
       <Head>
@@ -28,6 +105,11 @@ export default function Home() {
         <h1>Weekly Rank to $USDC</h1>
         <p className="description">
           Calculate your weekly USDC rewards based on your rank
+          {farcasterContext && (
+            <span style={{ color: '#667eea', fontSize: '14px', display: 'block', marginTop: '5px' }}>
+              ✓ Running in Farcaster Frame
+            </span>
+          )}
         </p>
         
         <div className="input-group">
@@ -41,8 +123,8 @@ export default function Home() {
           />
         </div>
         
-        <button className="calculate-btn" onClick={() => calculateReward()}>
-          Calculate Reward
+        <button className="calculate-btn" onClick={calculateReward} disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Calculate Reward'}
         </button>
         
         <div id="result" className="result-container"></div>
@@ -142,8 +224,13 @@ export default function Home() {
           margin-bottom: 20px;
         }
         
-        .calculate-btn:hover {
+        .calculate-btn:hover:not(:disabled) {
           transform: translateY(-2px);
+        }
+        
+        .calculate-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
         
         .result-container {
@@ -193,52 +280,6 @@ export default function Home() {
           padding: 20px;
         }
       `}</style>
-
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          function calculateReward() {
-            const rankInput = document.getElementById('rank');
-            const resultDiv = document.getElementById('result');
-            const rank = parseInt(rankInput.value);
-            
-            if (!rank || rank < 1 || rank > 3000) {
-              resultDiv.innerHTML = '<div style="color: red;">Please enter a valid rank between 1 and 3000</div>';
-              resultDiv.classList.add('show');
-              return;
-            }
-            
-            const tierInfo = getTierInfo(rank);
-            
-            if (tierInfo) {
-              resultDiv.innerHTML = \`
-                <div style="color: #333;">
-                  <h3>Your Reward</h3>
-                  <p><strong>Rank #\${rank}</strong></p>
-                  <p><strong>\${tierInfo.name}</strong></p>
-                  <p style="color: #667eea; font-size: 24px; font-weight: bold;">$\${tierInfo.prize.toFixed(2)} USDC</p>
-                </div>
-              \`;
-            } else {
-              resultDiv.innerHTML = '<div style="color: #999;">Rank #' + rank + ' - No reward available</div>';
-            }
-            
-            resultDiv.classList.add('show');
-          }
-          
-          function getTierInfo(rank) {
-            if (rank <= 3) return { name: 'Tier 1', prize: 600 };
-            if (rank <= 10) return { name: 'Tier 2', prize: 350 };
-            if (rank <= 30) return { name: 'Tier 3', prize: 125 };
-            if (rank <= 80) return { name: 'Tier 4', prize: 60 };
-            if (rank <= 180) return { name: 'Tier 5', prize: 30 };
-            if (rank <= 380) return { name: 'Tier 6', prize: 20 };
-            if (rank <= 780) return { name: 'Tier 7', prize: 10 };
-            if (rank <= 1580) return { name: 'Tier 8', prize: 5 };
-            if (rank <= 3000) return { name: 'Tier 9', prize: 3 };
-            return null;
-          }
-        `
-      }} />
     </>
   );
 }
