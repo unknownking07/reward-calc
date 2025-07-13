@@ -5,9 +5,9 @@
     "signature": "MHg4MjAzYWIwNTdhOGUwMmU0NmU1ODVhZWE1ODk2NDRkOThjODJjMTVhNjY4ZTIzZGQ0M2MwYzc0NzdhYWNhOTI1NTYwMDVmODZlNjUwZWE3MDQyZDQ2NmJhMzE4MTg3ODNmNDc1YWRiY2FhZjc1MGRkMGI2NGZhMDJmMmY1M2Y0ODFi"
   },
   "miniapp": {
-    "version": "1",
+    "version": "3",
     "name": "Weekly Rank USDC Calculator",
-    "iconUrl": "https://reward-calc-kqvp.vercel.app/icon-large.svg",
+    "iconUrl": "https://reward-calc-kqvp.vercel.app/icon-simple.svg",
     "homeUrl": "https://farcaster.xyz/miniapps/U-U53B-zNNUb/weekly-rank-usdc-calculator",
     "imageUrl": "https://reward-calc-kqvp.vercel.app/frame-image.png",
     "buttonTitle": "Calculate Rewards",

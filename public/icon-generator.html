@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 256px;
+            height: 256px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 256px;
+            height: 256px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .outer-ring {
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .inner-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .dollar-sign {
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .dollar-sign::before {
+            content: '$';
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .usdc-text {
+            position: absolute;
+            bottom: 40px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .sparkle {
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .sparkle1 { top: 60px; left: 60px; }
+        .sparkle2 { top: 70px; right: 60px; }
+        .sparkle3 { bottom: 70px; left: 50px; }
+        .sparkle4 { bottom: 60px; right: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="outer-ring"></div>
+        <div class="inner-circle">
+            <div class="dollar-sign">$</div>
+        </div>
+        <div class="usdc-text">USDC</div>
+        <div class="sparkle sparkle1">✨</div>
+        <div class="sparkle sparkle2">✨</div>
+        <div class="sparkle sparkle3">✨</div>
+        <div class="sparkle sparkle4">✨</div>
+    </div>
+    
+    <script>
+        // This HTML can be used to generate a PNG by taking a screenshot
+        console.log('Icon generator loaded - take a screenshot of this page at 256x256 to create a PNG icon');
+        
+        // Add canvas conversion capability
+        function convertToCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // You can use this to convert HTML to canvas if needed
+            return canvas;
+        }
+    </script>
+</body>
+</html>
