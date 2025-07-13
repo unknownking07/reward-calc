@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI0MDQ4NiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDc5OWZmRGFlYzM4QTg4MWI3OTNBQjE3QUYwOEI3RmE5Nzk0ZDE2QzMifQ",
+    "payload": "eyJkb21haW4iOiJyZXdhcmQtY2FsYy1rcXZwLnZlcmNlbC5hcHAifQ",
+    "signature": "MHg4MjAzYWIwNTdhOGUwMmU0NmU1ODVhZWE1ODk2NDRkOThjODJjMTVhNjY4ZTIzZGQ0M2MwYzc0NzdhYWNhOTI1NTYwMDVmODZlNjUwZWE3MDQyZDQ2NmJhMzE4MTg3ODNmNDc1YWRiY2FhZjc1MGRkMGI2NGZhMDJmMmY1M2Y0ODFi"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Example Frame",
+    "iconUrl": "https://reward-calc-kqvp.vercel.app/icon.png",
+    "homeUrl": "https://reward-calc-kqvp.vercel.app",
+    "imageUrl": "https://reward-calc-kqvp.vercel.app/image.png",
+    "buttonTitle": "Check this out",
+    "splashImageUrl": "https://reward-calc-kqvp.vercel.app/splash.png",
+    "splashBackgroundColor": "#eeccff",
+    "webhookUrl": "https://reward-calc-kqvp.vercel.app/api/webhook"
+  }
+}
