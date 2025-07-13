@@ -37,6 +37,9 @@ export default async function handler(req, res) {
         <body>
           <h1>Weekly Rank to $USDC Calculator</h1>
           <p>This frame calculates your weekly USDC rewards based on your rank.</p>
+          <footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+            built by <a href="https://farcaster.xyz/unknownking" style="color: #667eea; text-decoration: none;">@unknownking</a>
+          </footer>
         </body>
       </html>
     `;
@@ -49,23 +52,60 @@ export default async function handler(req, res) {
   // Handle POST requests for frame interactions
   if (req.method === 'POST') {
     try {
-      console.log('Frame POST request received:', req.body);
+      // Get the input text from the frame request
+      const frameData = req.body;
+      console.log('Received frame data:', frameData);
       
-      // Extract rank from frame data or use default
-      let rank = 25; // Default rank
-      
-      // Try to parse frame data if available
-      if (req.body && req.body.untrustedData) {
-        const buttonIndex = req.body.untrustedData.buttonIndex;
-        const inputText = req.body.untrustedData.inputText;
-        
-        if (inputText && !isNaN(parseInt(inputText))) {
-          rank = parseInt(inputText);
-          rank = Math.max(1, Math.min(3000, rank)); // Clamp between 1 and 3000
-        }
+      // Parse the input rank
+      let rank;
+      if (frameData && frameData.untrustedData && frameData.untrustedData.inputText) {
+        rank = parseInt(frameData.untrustedData.inputText);
+      } else {
+        rank = null;
       }
-
-      // Calculate reward
+      
+      console.log('Parsed rank:', rank);
+      
+      // Validate rank
+      if (!rank || rank < 1 || rank > 3000) {
+        const errorHtml = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>Invalid Rank</title>
+              
+              <!-- Farcaster Frame Meta Tags -->
+              <meta property="fc:frame" content="vNext">
+              <meta property="fc:frame:image" content="https://reward-calc-kqvp.vercel.app/frame-image.png">
+              <meta property="fc:frame:button:1" content="Try Again">
+              <meta property="fc:frame:button:1:action" content="post">
+              <meta property="fc:frame:button:1:target" content="https://reward-calc-kqvp.vercel.app/api/frame">
+              <meta property="fc:frame:input:text" content="Enter your rank (1-3000)">
+              
+              <!-- Open Graph Meta Tags -->
+              <meta property="og:title" content="Invalid Rank">
+              <meta property="og:description" content="Please enter a valid rank between 1 and 3000">
+              <meta property="og:image" content="https://reward-calc-kqvp.vercel.app/frame-image.png">
+              <meta property="og:url" content="https://reward-calc-kqvp.vercel.app">
+            </head>
+            <body>
+              <h1>Invalid Rank</h1>
+              <p>Please enter a valid rank between 1 and 3000.</p>
+              <footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+                built by <a href="https://farcaster.xyz/unknownking" style="color: #667eea; text-decoration: none;">@unknownking</a>
+              </footer>
+            </body>
+          </html>
+        `;
+        
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(errorHtml);
+        return;
+      }
+      
+      // Calculate tier info
       const tierInfo = getTierInfo(rank);
       const rewardText = tierInfo
         ? `Rank #${rank} - ${tierInfo.name}: $${tierInfo.prize.toFixed(2)} USDC`
@@ -91,7 +131,7 @@ export default async function handler(req, res) {
             <meta property="fc:frame:button:1:target" content="https://reward-calc-kqvp.vercel.app/api/frame">
             <meta property="fc:frame:button:2" content="Visit App">
             <meta property="fc:frame:button:2:action" content="link">
-            <meta property="fc:frame:button:2:target" content="https://reward-calc-kqvp.vercel.app">
+            <meta property="fc:frame:button:2:target" content="https://farcaster.xyz/miniapps/U-U53B-zNNUb/weekly-rank-usdc-calculator">
             <meta property="fc:frame:input:text" content="Enter your rank (1-3000)">
             
             <!-- Open Graph Meta Tags -->
@@ -103,6 +143,9 @@ export default async function handler(req, res) {
           <body>
             <h1>Your USDC Reward Result</h1>
             <p>${rewardText}</p>
+            <footer style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+              built by <a href="https://farcaster.xyz/unknownking" style="color: #667eea; text-decoration: none;">@unknownking</a>
+            </footer>
           </body>
         </html>
       `;
@@ -121,10 +164,10 @@ export default async function handler(req, res) {
   }
 
   // Method not allowed
-  res.setHeader('Allow', ['GET', 'POST', 'OPTIONS']);
   res.status(405).json({ error: 'Method not allowed' });
 }
 
+// Helper function to determine tier information based on rank
 function getTierInfo(rank) {
   if (rank <= 3) return { name: 'Tier 1', prize: 600 };
   if (rank <= 10) return { name: 'Tier 2', prize: 350 };
