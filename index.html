@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDC Rank Calculator</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext">
+    <meta property="fc:frame:image" content="https://your-domain.vercel.app/frame-image.png">
+    <meta property="fc:frame:button:1" content="Calculate Reward">
+    <meta property="fc:frame:button:1:action" content="link">
+    <meta property="fc:frame:button:1:target" content="https://your-domain.vercel.app">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="USDC Rank Calculator">
+    <meta property="og:description" content="Calculate your USDC rewards based on your rank">
+    <meta property="og:image" content="https://your-domain.vercel.app/frame-image.png">
+    <meta property="og:url" content="https://your-domain.vercel.app">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .reward-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .rank-info {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 USDC Rank Calculator</h1>
+        
+        <div class="input-group">
+            <label for="rank">Your Rank:</label>
+            <input type="number" id="rank" placeholder="Enter your rank (1-1000)" min="1" max="1000">
+        </div>
+        
+        <div class="input-group">
+            <label for="totalPool">Total USDC Pool:</label>
+            <input type="number" id="totalPool" placeholder="Enter total USDC pool" min="0" step="0.01">
+        </div>
+        
+        <button onclick="calculateReward()">Calculate My Reward</button>
+        
+        <div class="result" id="result">
+            <div class="reward-amount" id="rewardAmount">$0.00 USDC</div>
+            <div class="rank-info" id="rankInfo">Your rank details will appear here</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateReward() {
+            const rank = parseInt(document.getElementById('rank').value);
+            const totalPool = parseFloat(document.getElementById('totalPool').value);
+            
+            if (!rank || !totalPool || rank < 1 || rank > 1000) {
+                alert('Please enter valid rank (1-1000) and total pool amount');
+                return;
+            }
+            
+            // Example reward calculation - adjust this logic based on your needs
+            let rewardMultiplier;
+            if (rank <= 10) {
+                rewardMultiplier = 0.1; // Top 10 get 10% share
+            } else if (rank <= 50) {
+                rewardMultiplier = 0.05; // Next 40 get 5% share
+            } else if (rank <= 100) {
+                rewardMultiplier = 0.02; // Next 50 get 2% share
+            } else if (rank <= 500) {
+                rewardMultiplier = 0.01; // Next 400 get 1% share
+            } else {
+                rewardMultiplier = 0.005; // Rest get 0.5% share
+            }
+            
+            const reward = (totalPool * rewardMultiplier) / getRankBracketSize(rank);
+            
+            document.getElementById('rewardAmount').textContent = `$${reward.toFixed(2)} USDC`;
+            document.getElementById('rankInfo').textContent = `Rank #${rank} - ${getRankBracketName(rank)}`;
+            document.getElementById('result').classList.add('show');
+        }
+        
+        function getRankBracketSize(rank) {
+            if (rank <= 10) return 10;
+            if (rank <= 50) return 40;
+            if (rank <= 100) return 50;
+            if (rank <= 500) return 400;
+            return 500;
+        }
+        
+        function getRankBracketName(rank) {
+            if (rank <= 10) return 'Elite Tier';
+            if (rank <= 50) return 'Gold Tier';
+            if (rank <= 100) return 'Silver Tier';
+            if (rank <= 500) return 'Bronze Tier';
+            return 'Participant Tier';
+        }
+    </script>
+</body>
+</html>
