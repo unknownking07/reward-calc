@@ -19,7 +19,7 @@
     "crypto",
     "web3"
   ],
-  "author": "Your Name",
+  "author": "unknownking07",
   "license": "MIT",
   "devDependencies": {
     "serve": "^14.2.1"
