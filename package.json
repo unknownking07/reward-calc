@@ -1,0 +1,38 @@
+{
+  "name": "weekly-rank-usdc-calculator",
+  "version": "1.0.0",
+  "description": "Calculate your weekly USDC rewards based on your rank - A Farcaster Frame compatible application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx serve .",
+    "preview": "npx serve .",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "farcaster",
+    "frame",
+    "usdc",
+    "rewards",
+    "calculator",
+    "crypto",
+    "web3"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unknownking07/reward-calc.git"
+  },
+  "homepage": "https://reward-calc.vercel.app",
+  "bugs": {
+    "url": "https://github.com/unknownking07/reward-calc/issues"
+  }
+}
