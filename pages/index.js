@@ -304,6 +304,17 @@ Calculate your rewards too! 👇`;
             <div className="tier">Tier 9 (Rank 1581-3000): $3 USDC</div>
           </div>
         </div>
+        
+        <div className="footer-attribution">
+          <a 
+            href="https://farcaster.xyz/unknownking" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="attribution-link"
+          >
+            built by @unknownking
+          </a>
+        </div>
       </div>
 
       <style jsx>{`
@@ -473,6 +484,31 @@ Calculate your rewards too! 👇`;
           background: #f8f9fa;
           border-radius: 6px;
           color: #666;
+        }
+        
+        .footer-attribution {
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #e1e5e9;
+          text-align: center;
+        }
+        
+        .attribution-link {
+          color: #667eea;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          padding: 8px 16px;
+          border-radius: 20px;
+          background: rgba(102, 126, 234, 0.1);
+          transition: all 0.2s ease;
+          display: inline-block;
+        }
+        
+        .attribution-link:hover {
+          background: rgba(102, 126, 234, 0.2);
+          transform: translateY(-1px);
+          color: #5a67d8;
         }
       `}</style>
 
