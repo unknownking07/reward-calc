@@ -15,7 +15,7 @@ export default function handler(req, res) {
       "signature": "MHg4MjAzYWIwNTdhOGUwMmU0NmU1ODVhZWE1ODk2NDRkOThjODJjMTVhNjY4ZTIzZGQ0M2MwYzc0NzdhYWNhOTI1NTYwMDVmODZlNjUwZWE3MDQyZDQ2NmJhMzE4MTg3ODNmNDc1YWRiY2FhZjc1MGRkMGI2NGZhMDJmMmY1M2Y0ODFi"
     },
     "miniapp": {
-      "version": "4",
+      "version": "1",
       "name": "Weekly Rank USDC Calculator",
       "iconUrl": "https://reward-calc-kqvp.vercel.app/icon-simple.svg",
       "homeUrl": "https://farcaster.xyz/miniapps/U-U53B-zNNUb/weekly-rank-usdc-calculator",
@@ -23,7 +23,7 @@ export default function handler(req, res) {
       "buttonTitle": "Calculate Rewards",
       "splashImageUrl": "https://reward-calc-kqvp.vercel.app/splash-logo.svg",
       "splashBackgroundColor": "#667eea",
-      "description": "Calculate your weekly USDC rewards based on your Farcaster rank. Share your earnings with friends and climb the leaderboard! 💰"
+      "description": "Calculate your weekly USDC rewards based on your Farcaster rank. Share your earnings with friends and climb the leaderboard!"
     }
   };
 
