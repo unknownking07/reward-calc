@@ -4,52 +4,47 @@ import { useEffect, useState } from 'react';
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInFarcasterFrame, setIsInFarcasterFrame] = useState(false);
+  const [farcasterContext, setFarcasterContext] = useState(null);
 
   useEffect(() => {
-    // Initialize Farcaster Frame communication
-    const initializeFarcaster = () => {
+    // Initialize Farcaster Mini App SDK
+    const initializeFarcaster = async () => {
       try {
-        // Check if we're in an iframe (likely a Farcaster frame)
-        const inFrame = window.parent !== window;
-        
-        if (inFrame) {
-          // Check if the parent is a Farcaster client
-          const userAgent = navigator.userAgent;
-          const referrer = document.referrer;
+        // Check if we're in a mini app context
+        if (typeof window !== 'undefined') {
           
-          // Basic detection for Farcaster context
-          const isFarcasterContext = userAgent.includes('farcaster') || 
-                                   referrer.includes('warpcast') || 
-                                   referrer.includes('farcaster') ||
-                                   window.location !== window.parent.location;
+          // Import the official Farcaster Mini App SDK
+          const { sdk } = await import('@farcaster/miniapp-sdk');
           
-          if (isFarcasterContext || inFrame) {
+          console.log('Farcaster SDK imported successfully');
+          
+          // Get context information
+          const context = sdk.context;
+          console.log('Farcaster context:', context);
+          
+          if (context) {
+            setFarcasterContext(context);
             setIsInFarcasterFrame(true);
-            
-            // Signal to Farcaster that the frame is ready
-            // This is the equivalent of sdk.actions.ready()
-            window.parent.postMessage({
-              type: 'frame_ready',
-              timestamp: Date.now()
-            }, '*');
-            
-            console.log('Farcaster Frame ready() signal sent');
-            
-            // Listen for messages from Farcaster
-            const handleMessage = (event) => {
-              if (event.data && event.data.type === 'farcaster_frame') {
-                console.log('Received message from Farcaster:', event.data);
-              }
-            };
-            
-            window.addEventListener('message', handleMessage);
-            
-            // Cleanup
-            return () => window.removeEventListener('message', handleMessage);
           }
+          
+          // This is the critical call - it hides the splash screen
+          await sdk.actions.ready();
+          console.log('Farcaster Mini App ready() called successfully!');
+          
         }
       } catch (error) {
-        console.log('Frame detection error (normal if not in frame):', error);
+        console.log('Farcaster SDK not available or error occurred:', error);
+        // This is normal when running outside of Farcaster
+        
+        // Still call ready in case we're in a frame but SDK had issues
+        try {
+          window.parent.postMessage({
+            type: 'frame_ready',
+            timestamp: Date.now()
+          }, '*');
+        } catch (e) {
+          // Ignore errors for non-frame contexts
+        }
       } finally {
         setIsLoading(false);
       }
@@ -80,7 +75,8 @@ export default function Home() {
           <p><strong>Rank #${rank}</strong></p>
           <p><strong>${tierInfo.name}</strong></p>
           <p style="color: #667eea; font-size: 24px; font-weight: bold;">$${tierInfo.prize.toFixed(2)} USDC</p>
-          ${isInFarcasterFrame ? '<p style="color: #666; font-size: 12px;">✓ Calculated in Farcaster Frame</p>' : ''}
+          ${isInFarcasterFrame ? '<p style="color: #666; font-size: 12px;">✓ Calculated in Farcaster Mini App</p>' : ''}
+          ${farcasterContext?.user ? `<p style="color: #666; font-size: 12px;">User: ${farcasterContext.user.displayName || 'Anonymous'}</p>` : ''}
         </div>
       `;
     } else {
@@ -89,14 +85,18 @@ export default function Home() {
     
     resultDiv.classList.add('show');
     
-    // Notify parent frame of interaction if in Farcaster
-    if (isInFarcasterFrame) {
-      window.parent.postMessage({
-        type: 'frame_interaction',
-        action: 'calculate_reward',
-        data: { rank, tierInfo },
-        timestamp: Date.now()
-      }, '*');
+    // Send interaction event if we have the SDK
+    if (isInFarcasterFrame && farcasterContext) {
+      try {
+        window.parent.postMessage({
+          type: 'frame_interaction',
+          action: 'calculate_reward',
+          data: { rank, tierInfo },
+          timestamp: Date.now()
+        }, '*');
+      } catch (e) {
+        console.log('Could not send interaction event:', e);
+      }
     }
   };
 
@@ -142,7 +142,12 @@ export default function Home() {
           Calculate your weekly USDC rewards based on your rank
           {isInFarcasterFrame && (
             <span style={{ color: '#667eea', fontSize: '14px', display: 'block', marginTop: '5px' }}>
-              ✓ Running in Farcaster Frame
+              ✓ Running in Farcaster Mini App
+            </span>
+          )}
+          {isLoading && (
+            <span style={{ color: '#999', fontSize: '14px', display: 'block', marginTop: '5px' }}>
+              🔄 Initializing Farcaster SDK...
             </span>
           )}
         </p>
@@ -159,7 +164,7 @@ export default function Home() {
         </div>
         
         <button className="calculate-btn" onClick={calculateReward} disabled={isLoading}>
-          {isLoading ? 'Loading...' : 'Calculate Reward'}
+          {isLoading ? 'Loading SDK...' : 'Calculate Reward'}
         </button>
         
         <div id="result" className="result-container"></div>
