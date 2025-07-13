@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="128" cy="128" r="128" fill="url(#gradient)"/>
+  
+  <!-- Money/Dollar icon -->
+  <g transform="translate(64, 64)">
+    <!-- Dollar sign -->
+    <path d="M64 16v16m0 80v16M64 32c-17.673 0-32 14.327-32 32s14.327 32 32 32h32c8.837 0 16 7.163 16 16s-7.163 16-16 16H32" 
+          stroke="white" stroke-width="8" stroke-linecap="round"/>
+    <path d="M96 64c0-17.673-14.327-32-32-32H32c-8.837 0-16-7.163-16-16s7.163-16 16-16h64" 
+          stroke="white" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

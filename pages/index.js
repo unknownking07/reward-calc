@@ -5,6 +5,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInFarcasterFrame, setIsInFarcasterFrame] = useState(false);
   const [farcasterContext, setFarcasterContext] = useState(null);
+  const [lastCalculation, setLastCalculation] = useState(null);
 
   useEffect(() => {
     // Initialize Farcaster Mini App SDK
@@ -63,12 +64,20 @@ export default function Home() {
     if (!rank || rank < 1 || rank > 3000) {
       resultDiv.innerHTML = '<div style="color: red;">Please enter a valid rank between 1 and 3000</div>';
       resultDiv.classList.add('show');
+      setLastCalculation(null);
       return;
     }
     
     const tierInfo = getTierInfo(rank);
     
     if (tierInfo) {
+      const calculation = {
+        rank,
+        tierInfo,
+        timestamp: new Date().toISOString()
+      };
+      setLastCalculation(calculation);
+      
       resultDiv.innerHTML = `
         <div style="color: #333;">
           <h3>Your Reward</h3>
@@ -81,6 +90,7 @@ export default function Home() {
       `;
     } else {
       resultDiv.innerHTML = '<div style="color: #999;">Rank #' + rank + ' - No reward available</div>';
+      setLastCalculation(null);
     }
     
     resultDiv.classList.add('show');
@@ -98,6 +108,101 @@ export default function Home() {
         console.log('Could not send interaction event:', e);
       }
     }
+  };
+
+  const shareRewards = async () => {
+    if (!lastCalculation) {
+      alert('Please calculate your rewards first!');
+      return;
+    }
+
+    const { rank, tierInfo } = lastCalculation;
+    const shareText = `🎯 Just checked my Farcaster rank!
+
+📊 Rank: #${rank}
+🏆 Tier: ${tierInfo.name}
+💰 Weekly Reward: $${tierInfo.prize.toFixed(2)} USDC
+
+Calculate your rewards too! 👇`;
+
+    const shareUrl = 'https://reward-calc-kqvp.vercel.app';
+
+    // Try Farcaster sharing first if available
+    if (isInFarcasterFrame && farcasterContext) {
+      try {
+        // Use Farcaster's sharing mechanism
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        
+        // Check if SDK has sharing capabilities
+        if (sdk.actions && sdk.actions.openUrl) {
+          const farcasterShareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
+          await sdk.actions.openUrl(farcasterShareUrl);
+          return;
+        }
+      } catch (error) {
+        console.log('Farcaster sharing not available:', error);
+      }
+    }
+
+    // Fallback to web sharing
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'My Weekly USDC Rewards',
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Web sharing failed:', error);
+        fallbackShare(shareText, shareUrl);
+      }
+    } else {
+      fallbackShare(shareText, shareUrl);
+    }
+  };
+
+  const fallbackShare = (text, url) => {
+    // Copy to clipboard as fallback
+    const fullText = `${text}\n\n${url}`;
+    
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(fullText).then(() => {
+        alert('✅ Reward details copied to clipboard! Paste it in your favorite social app.');
+      }).catch(() => {
+        // Manual copy fallback
+        showShareModal(fullText);
+      });
+    } else {
+      showShareModal(fullText);
+    }
+  };
+
+  const showShareModal = (text) => {
+    // Create a simple modal for manual copying
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8); display: flex; align-items: center;
+      justify-content: center; z-index: 1000;
+    `;
+    
+    modal.innerHTML = `
+      <div style="background: white; padding: 20px; border-radius: 12px; max-width: 400px; margin: 20px;">
+        <h3 style="margin-bottom: 15px; color: #333;">Share Your Rewards</h3>
+        <textarea readonly style="width: 100%; height: 120px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: none; margin-bottom: 15px;">${text}</textarea>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="navigator.clipboard.writeText('${text}').then(() => alert('Copied!')).catch(() => {})" style="flex: 1; padding: 10px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Copy Text</button>
+          <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="flex: 1; padding: 10px; background: #666; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
   };
 
   const getTierInfo = (rank) => {
@@ -133,11 +238,18 @@ export default function Home() {
         <meta property="og:image" content="https://reward-calc-kqvp.vercel.app/frame-image.png" />
         <meta property="og:url" content="https://reward-calc-kqvp.vercel.app" />
         
-        <link rel="icon" href="/favicon.ico" />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
       </Head>
 
       <div className="container">
-        <h1>Weekly Rank to $USDC</h1>
+        <div className="header">
+          <div className="icon">💰</div>
+          <h1>Weekly Rank to $USDC</h1>
+        </div>
+        
         <p className="description">
           Calculate your weekly USDC rewards based on your rank
           {isInFarcasterFrame && (
@@ -163,9 +275,18 @@ export default function Home() {
           />
         </div>
         
-        <button className="calculate-btn" onClick={calculateReward} disabled={isLoading}>
-          {isLoading ? 'Loading SDK...' : 'Calculate Reward'}
-        </button>
+        <div className="button-group">
+          <button className="calculate-btn" onClick={calculateReward} disabled={isLoading}>
+            {isLoading ? 'Loading SDK...' : 'Calculate Reward'}
+          </button>
+          
+          {lastCalculation && (
+            <button className="share-btn" onClick={shareRewards}>
+              <span className="share-icon">📤</span>
+              Share My Rewards
+            </button>
+          )}
+        </div>
         
         <div id="result" className="result-container"></div>
         
@@ -212,10 +333,26 @@ export default function Home() {
           text-align: center;
         }
         
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+          gap: 12px;
+        }
+        
+        .icon {
+          font-size: 32px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
         h1 {
           color: #333;
-          margin-bottom: 30px;
           font-size: 28px;
+          margin: 0;
         }
         
         .description {
@@ -251,6 +388,13 @@ export default function Home() {
           border-color: #667eea;
         }
         
+        .button-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+        
         .calculate-btn {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
@@ -261,7 +405,6 @@ export default function Home() {
           font-weight: 600;
           cursor: pointer;
           transition: transform 0.2s ease;
-          margin-bottom: 20px;
         }
         
         .calculate-btn:hover:not(:disabled) {
@@ -271,6 +414,30 @@ export default function Home() {
         .calculate-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+        
+        .share-btn {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+        
+        .share-btn:hover {
+          transform: translateY(-2px);
+        }
+        
+        .share-icon {
+          font-size: 18px;
         }
         
         .result-container {
