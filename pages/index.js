@@ -342,6 +342,7 @@ Calculate your rewards too! 👇`;
           max-width: 400px;
           width: 100%;
           text-align: center;
+          margin-top: 20px;
         }
         
         .header {
@@ -518,7 +519,7 @@ Calculate your rewards too! 👇`;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           padding: 20px;
         }
