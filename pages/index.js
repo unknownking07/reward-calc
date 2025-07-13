@@ -3,36 +3,61 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
-  const [farcasterContext, setFarcasterContext] = useState(null);
+  const [isInFarcasterFrame, setIsInFarcasterFrame] = useState(false);
 
   useEffect(() => {
-    // Initialize Farcaster SDK when component mounts
-    const initializeFarcaster = async () => {
+    // Initialize Farcaster Frame communication
+    const initializeFarcaster = () => {
       try {
-        // Check if we're in a Farcaster context
-        if (typeof window !== 'undefined' && window.parent !== window) {
-          // We're likely in a Farcaster frame
+        // Check if we're in an iframe (likely a Farcaster frame)
+        const inFrame = window.parent !== window;
+        
+        if (inFrame) {
+          // Check if the parent is a Farcaster client
+          const userAgent = navigator.userAgent;
+          const referrer = document.referrer;
           
-          // Import Farcaster SDK dynamically to avoid SSR issues
-          const { sdk } = await import('@farcaster/frame-sdk');
+          // Basic detection for Farcaster context
+          const isFarcasterContext = userAgent.includes('farcaster') || 
+                                   referrer.includes('warpcast') || 
+                                   referrer.includes('farcaster') ||
+                                   window.location !== window.parent.location;
           
-          // Initialize the SDK
-          const context = await sdk.context;
-          setFarcasterContext(context);
-          
-          // Signal that the frame is ready
-          sdk.actions.ready();
-          console.log('Farcaster SDK initialized and ready() called');
+          if (isFarcasterContext || inFrame) {
+            setIsInFarcasterFrame(true);
+            
+            // Signal to Farcaster that the frame is ready
+            // This is the equivalent of sdk.actions.ready()
+            window.parent.postMessage({
+              type: 'frame_ready',
+              timestamp: Date.now()
+            }, '*');
+            
+            console.log('Farcaster Frame ready() signal sent');
+            
+            // Listen for messages from Farcaster
+            const handleMessage = (event) => {
+              if (event.data && event.data.type === 'farcaster_frame') {
+                console.log('Received message from Farcaster:', event.data);
+              }
+            };
+            
+            window.addEventListener('message', handleMessage);
+            
+            // Cleanup
+            return () => window.removeEventListener('message', handleMessage);
+          }
         }
       } catch (error) {
-        console.log('Not in Farcaster context or SDK unavailable:', error);
-        // This is normal when running outside of Farcaster
+        console.log('Frame detection error (normal if not in frame):', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeFarcaster();
+    // Add a small delay to ensure proper initialization
+    const timer = setTimeout(initializeFarcaster, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const calculateReward = () => {
@@ -55,7 +80,7 @@ export default function Home() {
           <p><strong>Rank #${rank}</strong></p>
           <p><strong>${tierInfo.name}</strong></p>
           <p style="color: #667eea; font-size: 24px; font-weight: bold;">$${tierInfo.prize.toFixed(2)} USDC</p>
-          ${farcasterContext ? `<p style="color: #666; font-size: 12px;">Farcaster User: ${farcasterContext.user?.displayName || 'Anonymous'}</p>` : ''}
+          ${isInFarcasterFrame ? '<p style="color: #666; font-size: 12px;">✓ Calculated in Farcaster Frame</p>' : ''}
         </div>
       `;
     } else {
@@ -63,6 +88,16 @@ export default function Home() {
     }
     
     resultDiv.classList.add('show');
+    
+    // Notify parent frame of interaction if in Farcaster
+    if (isInFarcasterFrame) {
+      window.parent.postMessage({
+        type: 'frame_interaction',
+        action: 'calculate_reward',
+        data: { rank, tierInfo },
+        timestamp: Date.now()
+      }, '*');
+    }
   };
 
   const getTierInfo = (rank) => {
@@ -105,7 +140,7 @@ export default function Home() {
         <h1>Weekly Rank to $USDC</h1>
         <p className="description">
           Calculate your weekly USDC rewards based on your rank
-          {farcasterContext && (
+          {isInFarcasterFrame && (
             <span style={{ color: '#667eea', fontSize: '14px', display: 'block', marginTop: '5px' }}>
               ✓ Running in Farcaster Frame
             </span>
